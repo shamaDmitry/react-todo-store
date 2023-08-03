@@ -3,18 +3,31 @@ import { account } from '../../appwrite';
 
 const useAuthStore = create((set, get) => ({
   user: null,
-  logIn: async () => {
-    const user = await account.createEmailSession('admin@admin.com', 'test1234');
-    set({ user });
-  },
-  logOut: async () => {
-    await account.deleteSessions();
-  },
-  getCurrentUser: async () => {
-    const user = await account.get();
+  logIn: async ({ email, password }) => {
+    try {
+      return await account.createEmailSession(email, password);
+    } catch (error) {
+      console.log('error', error);
+      throw new Error(error.message)
+    }
 
-    set({ user });
+    // promise.then(function (response) {
+    //   console.log(response); // Success
+    //   set({ user: response });
+    // }, function (error) {
+    //   return error
+    // });
   },
+
+  getCurrentUser: async () => {
+    return await account.get();
+    // set({ user });
+  },
+
+  logOut: async () => {
+    return await account.deleteSession('current');
+  },
+
   createJWT: async () => {
     const jwt = account.createJWT();
   },
