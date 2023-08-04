@@ -1,12 +1,12 @@
-import React from "react"
 import { Outlet, Navigate, useLocation } from "react-router-dom"
-// import { LOCAL_STORAGE_TOKEN_NAME } from "../config";
+import { LOCAL_STORAGE_TOKEN_NAME } from "../../config";
 
 const ProtectedRoute = () => {
-  const isLoggedIn = localStorage.getItem("user");
   const location = useLocation();
+  const tokenStr = localStorage.getItem(LOCAL_STORAGE_TOKEN_NAME);
+  const token = JSON.parse(tokenStr);
 
-  if (!isLoggedIn) {
+  if (!token) {
     return (
       <Navigate
         to="/login"

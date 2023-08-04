@@ -1,8 +1,11 @@
 import { redirect } from "react-router-dom";
-// import { LOCAL_STORAGE_TOKEN_NAME } from "../config";
+import { LOCAL_STORAGE_TOKEN_NAME } from "../../config";
 
 export const authLoader = () => {
-  const token = localStorage.getItem("user")
+  console.log('loader');
 
-  return token ? redirect('/orders') : null;
+  const tokenStr = localStorage.getItem(LOCAL_STORAGE_TOKEN_NAME);
+  const token = JSON.parse(tokenStr);
+
+  return token ? redirect('/todos') : null;
 }

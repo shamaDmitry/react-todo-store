@@ -2,40 +2,68 @@ import { create } from 'zustand'
 import { account } from '../../appwrite';
 
 const useAuthStore = create((set, get) => ({
-  user: null,
+  user: JSON.parse(localStorage.getItem('user')) || null,
   logIn: async ({ email, password }) => {
     try {
-      return await account.createEmailSession(email, password);
+      await account.createEmailSession(email, password);
+      const user = await get().getCurrentUser();
+
+      set({ user });
+      localStorage.setItem('user', JSON.stringify(user));
+      return user;
     } catch (error) {
       console.log('error', error);
-      throw new Error(error.message)
+      return new Promise((resolve, reject) => reject(new Error(error)))
     }
-
-    // promise.then(function (response) {
-    //   console.log(response); // Success
-    //   set({ user: response });
-    // }, function (error) {
-    //   return error
-    // });
   },
 
   getCurrentUser: async () => {
-    return await account.get();
-    // set({ user });
+    try {
+      const user = await account.get();
+      set({ user });
+
+      return user;
+    } catch (error) {
+      console.log('error', error);
+      return new Promise((resolve, reject) => reject(new Error(error)))
+    }
   },
 
   logOut: async () => {
-    return await account.deleteSession('current');
+    try {
+      await account.deleteSession('current');
+      localStorage.clear();
+    } catch (error) {
+      console.log('error', error);
+      return new Promise((resolve, reject) => reject(new Error(error)))
+    }
   },
 
   createJWT: async () => {
-    const jwt = account.createJWT();
+    try {
+      await account.createJWT();
+    } catch (error) {
+      console.log('error', error);
+      return new Promise((resolve, reject) => reject(new Error(error)))
+    }
   },
+
   listSessions: async () => {
-    const sessions = await account.listSessions();
+    try {
+      return await account.listSessions();
+    } catch (error) {
+      console.log('error', error);
+      return new Promise((resolve, reject) => reject(new Error(error)))
+    }
   },
+  
   listLogs: async () => {
-    const logs = await account.listLogs();
+    try {
+      return await account.listLogs();
+    } catch (error) {
+      console.log('error', error);
+      return new Promise((resolve, reject) => reject(new Error(error)))
+    }
   },
 }));
 

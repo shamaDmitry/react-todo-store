@@ -1,24 +1,16 @@
 import classNames from 'classnames';
-import { useEffect } from 'react'
-import useTodosStore from './store/todoStore';
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid'
-import Navbar from './Components/Navbar';
+import useTodosStore from '../store/todoStore';
 
-function App() {
-  const [todos, getAllTodos, setTodoChecked, getAllCompletedTodos, todo, setTodo, createTodo] = useTodosStore(state => [
+function Todos() {
+  const [todos, setTodoChecked, getAllCompletedTodos, todo, setTodo, createTodo] = useTodosStore(state => [
     state.todos,
-    state.getAllTodos,
     state.setTodoChecked,
     state.getAllCompletedTodos,
     state.todo,
     state.setTodo,
     state.createTodo,
   ])
-
-  // useEffect(() => {
-  //   getAllTodos()
-  //   return () => { };
-  // }, [getAllTodos]);
 
   const handleChecked = (todo) => {
     setTodoChecked(todo)
@@ -32,20 +24,7 @@ function App() {
 
   return (
     <>
-      <Navbar />
-
-      <div className="container flex flex-col items-center justify-center p-4">
-        <h1 className="mb-4 text-xl">
-          Stack:
-        </h1>
-
-        <ul className="mb-8 list-decimal list-inside">
-          <li>react</li>
-          <li>tailwind</li>
-          <li>Appwrite</li>
-          <li>zustand</li>
-        </ul>
-
+      <div className="flex flex-col items-center justify-center">
         <h2 className="mb-4 text-lg">
           Todos: {getAllCompletedTodos()} / {todos.length}
         </h2>
@@ -106,4 +85,4 @@ function App() {
   )
 }
 
-export default App
+export default Todos

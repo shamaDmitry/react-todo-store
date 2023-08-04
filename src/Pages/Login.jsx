@@ -1,73 +1,76 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 
 import useAuthStore from '../store/authStore';
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const [logIn, user] = useAuthStore(state => [
+  const [email, setEmail] = useState("admin2@admin2.com");
+  const [password, setPassword] = useState("test1234");
+
+  const [logIn] = useAuthStore(state => [
     state.logIn,
-    state.user,
   ]);
-
-  const handleCurrentUser = async () => {
-
-  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    logIn({
-      email,
-      password,
-    }).then(res => {
-      console.log('res', res);
-    })
+    // logIn({
+    //   email,
+    //   password,
+    // }).then((res) => {
+    //   navigate(location.state?.from || '/orders', {
+    //     replace: true
+    //   })
+    // })
 
-    // await toast.promise(
-    //   logIn({
-    //     email,
-    //     password,
-    //   }),
-    //   {
-    //     pending: {
-    //       render() {
-    //         return "I'm loading"
-    //       },
-    //       icon: true,
-    //     },
-    //     success: {
-    //       render({ data }) {
-    //         return `Hello ${data}`
-    //       },
-    //       // other options
-    //       icon: "🟢",
-    //     },
-    //     error: {
-    //       render({ data }) {
-    //         return (
-    //           <p>
-    //             {data.response.message}
-    //           </p>
-    //         )
-    //       }
-    //     }
-    //   }
-    // )
+    const response = toast.promise(
+      logIn({
+        email,
+        password,
+      }),
+      {
+        pending: {
+          render() {
+            return "I'm loading"
+          },
+        },
+        success: {
+          render({ data }) {
+            return `Hello ${data.providerUid}`
+          },
+        },
+        error: {
+          render({ data }) {
+            const message = data.message;
+
+            return <div>{message}</div>
+          }
+        }
+      }
+    );
+
+    response.then(() => {
+      navigate(location.state?.from || '/todos', {
+        replace: true
+      })
+    })
   }
 
   return (
     <div className="flex flex-col items-center justify-center p-8">
       <ToastContainer />
 
-      <h1 className="mb-4">LOGIN</h1>
+      {
+        location.state && <div className="mb-3 text-red-500">
+          {location.state.message}
+        </div>
+      }
 
-      <pre>
-        {JSON.stringify(user)}
-      </pre>
+      <h1 className="mb-4">LOGIN</h1>
 
       <form
         className="flex flex-col gap-4 mb-4"
@@ -96,13 +99,6 @@ const Login = () => {
           login
         </button>
       </form>
-
-      <button
-        onClick={handleCurrentUser}
-        className="p-2 border border-cyan-500"
-      >
-        handleCurrentUser
-      </button>
 
       <Link
         to="/register"

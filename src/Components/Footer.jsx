@@ -1,9 +1,9 @@
-import React from 'react';
-
 const Footer = () => {
   return (
-    <div>
-      FOOTER
+    <div className="py-4 mt-auto border-t">
+      <div className="container">
+        FOOTER
+      </div>
     </div>
   );
 }
