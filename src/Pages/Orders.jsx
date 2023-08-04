@@ -1,8 +1,14 @@
+import Title from "../Components/atoms/Title";
+
 const Orders = () => {
   return (
-    <div>
-      ORDERS
-    </div>
+    <section>
+      <Title
+        text="Orders"
+      />
+
+      <p>nothing is here</p>
+    </section>
   );
 }
 

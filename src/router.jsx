@@ -17,6 +17,7 @@ import Orders from './Pages/Orders';
 import Page_404 from './Pages/Page_404';
 import Todos from './Pages/Todos';
 import About from './Pages/About';
+import Profile from './Pages/User/Profile';
 
 const router = createBrowserRouter(createRoutesFromElements(
   <>
@@ -43,6 +44,7 @@ const router = createBrowserRouter(createRoutesFromElements(
         <Route index path="/orders" element={<Orders />} />
         <Route path="/todos" element={<Todos />} />
         <Route path="/about" element={<About />} />
+        <Route path="/profile" element={<Profile />} />
       </Route>
     </Route>
 

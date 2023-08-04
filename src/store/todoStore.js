@@ -1,3 +1,4 @@
+import { Permission, Role } from 'appwrite';
 import { create } from 'zustand'
 import { databases, ID } from '../../appwrite';
 
@@ -7,7 +8,7 @@ const useTodosStore = create((set, get) => ({
   setTodo: (todo) => {
     set({ todo })
   },
-  createTodo: async (title) => {
+  createTodo: async (title, userId) => {
     await databases.createDocument(
       import.meta.env.VITE_DATABASE_ID,
       import.meta.env.VITE_COLLECTION_ID,
@@ -15,7 +16,10 @@ const useTodosStore = create((set, get) => ({
       {
         title,
         isDone: false
-      }
+      },
+      [
+        Permission.read(Role.user(userId)),
+      ]
     );
 
     get().getAllTodos();

@@ -1,16 +1,29 @@
 import classNames from 'classnames';
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid'
 import useTodosStore from '../store/todoStore';
+import useAuthStore from '../store/authStore';
+import { useEffect } from 'react';
+import Title from '../Components/atoms/Title';
 
 function Todos() {
-  const [todos, setTodoChecked, getAllCompletedTodos, todo, setTodo, createTodo] = useTodosStore(state => [
+  const [user] = useAuthStore(state => [
+    state.user,
+  ]);
+
+  const [todos, getAllTodos, setTodoChecked, getAllCompletedTodos, todo, setTodo, createTodo] = useTodosStore(state => [
     state.todos,
+    state.getAllTodos,
     state.setTodoChecked,
     state.getAllCompletedTodos,
     state.todo,
     state.setTodo,
     state.createTodo,
-  ])
+  ]);
+
+  useEffect(() => {
+    getAllTodos()
+    return () => { };
+  }, [getAllTodos]);
 
   const handleChecked = (todo) => {
     setTodoChecked(todo)
@@ -19,12 +32,17 @@ function Todos() {
   const handleSubmit = (e) => {
     e.preventDefault()
     setTodo("");
-    createTodo(todo);
+    createTodo(todo, user.$id);
   }
 
   return (
-    <>
+    <section className="">
+      <Title
+        text="Todos"
+      />
+
       <div className="flex flex-col items-center justify-center">
+
         <h2 className="mb-4 text-lg">
           Todos: {getAllCompletedTodos()} / {todos.length}
         </h2>
@@ -80,8 +98,7 @@ function Todos() {
           })}
         </div>
       </div>
-    </>
-
+    </section>
   )
 }
 

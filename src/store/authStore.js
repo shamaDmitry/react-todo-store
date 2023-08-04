@@ -1,8 +1,23 @@
 import { create } from 'zustand'
-import { account } from '../../appwrite';
+import { account, ID } from '../../appwrite';
 
 const useAuthStore = create((set, get) => ({
-  user: JSON.parse(localStorage.getItem('user')) || null,
+  signUp: async ({ name, email, password }) => {
+    try {
+      const user = await account.create(
+        ID.unique(),
+        email,
+        password,
+        name,
+      );
+
+      await get().logIn({ email: user.email, password });
+    } catch (error) {
+      console.log('error', error);
+      return new Promise((resolve, reject) => reject(new Error(error)))
+    }
+  },
+
   logIn: async ({ email, password }) => {
     try {
       await account.createEmailSession(email, password);
@@ -56,7 +71,7 @@ const useAuthStore = create((set, get) => ({
       return new Promise((resolve, reject) => reject(new Error(error)))
     }
   },
-  
+
   listLogs: async () => {
     try {
       return await account.listLogs();
@@ -65,6 +80,8 @@ const useAuthStore = create((set, get) => ({
       return new Promise((resolve, reject) => reject(new Error(error)))
     }
   },
+
+  user: JSON.parse(localStorage.getItem('user')) || null,
 }));
 
 export default useAuthStore;

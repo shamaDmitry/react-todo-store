@@ -1,9 +1,11 @@
+import Title from "../Components/atoms/Title";
+
 const About = () => {
   return (
-    <div>
-      <h1 className="mb-4 text-xl">
-        Stack:
-      </h1>
+    <section>
+      <Title
+        text="Stack"
+      />
 
       <ul className="mb-8 list-decimal list-inside">
         <li>react</li>
@@ -11,7 +13,7 @@ const About = () => {
         <li>Appwrite</li>
         <li>zustand</li>
       </ul>
-    </div>
+    </section>
   );
 }
 

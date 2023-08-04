@@ -5,11 +5,11 @@ import { ToastContainer, toast } from 'react-toastify';
 import useAuthStore from '../store/authStore';
 
 const Login = () => {
+  const [email, setEmail] = useState("test@test.com");
+  const [password, setPassword] = useState("test1234");
+
   const navigate = useNavigate();
   const location = useLocation();
-
-  const [email, setEmail] = useState("admin2@admin2.com");
-  const [password, setPassword] = useState("test1234");
 
   const [logIn] = useAuthStore(state => [
     state.logIn,
@@ -17,15 +17,6 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // logIn({
-    //   email,
-    //   password,
-    // }).then((res) => {
-    //   navigate(location.state?.from || '/orders', {
-    //     replace: true
-    //   })
-    // })
 
     const response = toast.promise(
       logIn({

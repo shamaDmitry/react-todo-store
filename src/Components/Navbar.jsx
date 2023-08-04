@@ -1,7 +1,7 @@
-import classNames from 'classnames';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import useAuthStore from '../store/authStore';
+import UserNavMenu from './user/UserNavMenu';
 
 const menuItems = [
   {
@@ -39,7 +39,7 @@ const Navbar = () => {
   }
 
   return (
-    <header className="py-4 border-b">
+    <header className="py-2 border-b shadow-lg">
       <div className="container">
         <nav className="flex items-center justify-center">
           <Link
@@ -74,17 +74,10 @@ const Navbar = () => {
               login
             </button>}
 
-            <div className="flex flex-col items-center justify-center px-3 py-1 border">
-              <span className="font-medium">{user.name}</span>
-              <span className="text-sm text-gray-500">{user.email}</span>
-            </div>
-
-            <button
-              className={classNames("px-3 py-1 border bg-red-500 text-white border-red-500 hover:bg-red-700 hover:border-red-700")}
-              onClick={handleLogOut}
-            >
-              logOut
-            </button>
+            <UserNavMenu
+              user={user}
+              handleLogOut={handleLogOut}
+            />
           </div>
         </nav>
       </div>
