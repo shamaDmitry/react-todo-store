@@ -22,7 +22,7 @@ const menuItems = [
 ]
 
 const Navbar = () => {
-  const [user, logIn, logOut] = useAuthStore(state => [
+  const [user, logIn, logOut,] = useAuthStore(state => [
     state.user,
     state.logIn,
     state.logOut,

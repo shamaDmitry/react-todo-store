@@ -11,7 +11,7 @@ const UserNavMenu = ({ user, handleLogOut }) => {
       <div>
         <Menu.Button className="inline-flex items-center w-full px-4 py-2 text-sm font-medium text-black border">
           <div className="flex flex-col items-start">
-            {/* <span className="text-xs text-gray-500">id: {user.$id}</span> */}
+            <span className="text-xs text-gray-500">id: {user.$id}</span>
             <span className="font-medium">name: {user.name}</span>
             <span className="text-sm text-gray-500">email: {user.email}</span>
           </div>

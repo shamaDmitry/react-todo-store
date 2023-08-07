@@ -54,18 +54,18 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
-  createJWT: async () => {
+  listSessions: async () => {
     try {
-      await account.createJWT();
+      return await account.listSessions();
     } catch (error) {
       console.log('error', error);
       return new Promise((resolve, reject) => reject(new Error(error)))
     }
   },
-
-  listSessions: async () => {
+  
+  getSession: async () => {
     try {
-      return await account.listSessions();
+      return await account.getSession('current');
     } catch (error) {
       console.log('error', error);
       return new Promise((resolve, reject) => reject(new Error(error)))
