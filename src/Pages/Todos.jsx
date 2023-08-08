@@ -1,25 +1,19 @@
 import classNames from 'classnames';
-import { CheckIcon, XMarkIcon, TrashIcon, PencilIcon } from '@heroicons/react/24/solid'
+import { CheckIcon, XMarkIcon, TrashIcon, ArchiveBoxXMarkIcon } from '@heroicons/react/24/solid'
 import useTodosStore from '../store/todoStore';
-import useAuthStore from '../store/authStore';
 import { useEffect, useState } from 'react';
 import Title from '../Components/atoms/Title';
 import { ToastContainer, toast } from 'react-toastify';
 import Spinner from '../Components/atoms/Spinner';
+import InlineEditor from '../Components/atoms/InlineEditor';
+import TodoForm from '../Components/todos/TodoForm';
 
 function Todos() {
-  const [user] = useAuthStore(state => [
-    state.user,
-  ]);
-
   const [
     todos,
     getAllTodos,
     setTodoChecked,
     getAllCompletedTodos,
-    todo,
-    setTodo,
-    createTodo,
     deleteTodo,
     updateTodo,
   ] = useTodosStore(state => [
@@ -27,27 +21,30 @@ function Todos() {
     state.getAllTodos,
     state.setTodoChecked,
     state.getAllCompletedTodos,
-    state.todo,
-    state.setTodo,
-    state.createTodo,
     state.deleteTodo,
     state.updateTodo,
   ]);
 
   const [loading, setLoading] = useState(false);
-  const [isEdit, setIsEdit] = useState(false);
-  const [updatedTodo, setUpdatedTodo] = useState("");
 
-  const handleUpdate = (todo) => {
-    setIsEdit(false);
-    console.log('updatedTodo', updatedTodo);
-
-    // updateTodo(todo)
+  const handleUpdate = (updated) => {
+    toast.promise(
+      updateTodo(updated),
+      {
+        pending: "Updating...",
+        success: "Updated",
+        error: {
+          render({ data }) {
+            return <div>{data.message}</div>
+          }
+        }
+      }
+    );
   }
 
   useEffect(() => {
     setLoading(true);
-    getAllTodos(user.$id).then(() => setLoading(false))
+    getAllTodos().then(() => setLoading(false))
     return () => { };
   }, [getAllTodos]);
 
@@ -71,7 +68,10 @@ function Todos() {
       deleteTodo(todoId),
       {
         pending: "Deleting...",
-        success: "Deleted",
+        success: {
+          render: () => "Deleted",
+          icon: <ArchiveBoxXMarkIcon className="text-red-500" />,
+        },
         error: {
           render({ data }) {
             const message = data.message;
@@ -83,123 +83,72 @@ function Todos() {
     );
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    setTodo("");
-    createTodo(todo, user.$id);
-  }
+  if (loading) {
+    return <Spinner className="w-5 mb-4 text-cyan-500" />
+  } else {
+    return (
+      <section className="">
+        <ToastContainer />
 
-  return (
-    <section className="">
-      <ToastContainer />
+        <Title
+          text="Todos"
+        />
 
-      {/* <Spinner className="w-5 text-cyan-500" /> */}
+        <div className="flex flex-col items-center justify-center">
+          <h2 className="mb-4 text-lg">
+            Todos: {getAllCompletedTodos()} / {todos.length}
+          </h2>
 
-      <Title
-        text="Todos"
-      />
+          <TodoForm />
 
-      <div className="flex flex-col items-center justify-center">
-        <h2 className="mb-4 text-lg">
-          Todos: {getAllCompletedTodos()} / {todos.length}
-        </h2>
+          <div className="flex flex-col w-full max-w-md">
+            {todos.length ? todos.map(todo => {
+              return (
+                <div
+                  key={todo.$id}
+                  className={classNames("flex items-start p-2 mb-4 border gap-x-2 w-full", {
+                    "border-red-500": !todo.isDone,
+                    "border-green-500": todo.isDone,
+                  })}
+                >
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      onChange={() => handleChecked(todo)}
+                      checked={todo.isDone}
+                      className="sr-only peer"
+                    />
 
-        <form
-          className="mb-4"
-          onSubmit={handleSubmit}
-        >
-          <input
-            type="text"
-            value={todo}
-            onChange={(e) => setTodo(e.target.value)}
-            className="px-4 py-2 border placeholder:capitalize"
-            placeholder="add todo"
-          />
-        </form>
+                    <span
+                      className={classNames("w-8 h-8 border rounded-none text-white", {
+                        "bg-red-500 border-red-500 hover:bg-red-700": !todo.isDone,
+                        "bg-green-500 border-green-500 hover:bg-green-700": todo.isDone
+                      })}
+                    >
+                      {todo.isDone ? <CheckIcon /> : <XMarkIcon />}
+                    </span>
+                  </label>
 
-        <div className="flex flex-col items-start justify-center max-w-md">
-          {!todos.length && <p>nothing is here</p>}
-
-          {loading && <Spinner className="w-5 text-cyan-500" />}
-
-          {todos.map(todo => {
-            return (
-              <div
-                key={todo.$id}
-                className={classNames("inline-flex items-center justify-between p-2 mb-4 border gap-x-4 min-w-full", {
-                  "border-red-500": !todo.isDone,
-                  "border-green-500": todo.isDone,
-                })}
-              >
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    onChange={() => handleChecked(todo)}
-                    checked={todo.isDone}
-                    className="sr-only peer"
+                  <InlineEditor
+                    value={todo.title}
+                    todo={todo}
+                    handleUpdate={handleUpdate}
                   />
 
-                  <span
-                    className={classNames("w-8 h-8 border rounded-none text-white", {
-                      "bg-red-500 border-red-500 hover:bg-red-700": !todo.isDone,
-                      "bg-green-500 border-green-500 hover:bg-green-700": todo.isDone
-                    })}
+                  <button
+                    onClick={() => handleDelete(todo.$id)}
+                    className="px-2 py-1 text-red-500 hover:text-red-700"
                   >
-                    {todo.isDone ? <CheckIcon /> : <XMarkIcon />}
-                  </span>
-                </label>
-
-                <p className='text-red-600'>
-                  {updatedTodo}
-                </p>
-
-                {isEdit ?
-                  <input
-                    type="text"
-                    className="border"
-                    defaultValue={updatedTodo}
-                    onChange={(event) => {
-                      setUpdatedTodo(event.target.name)
-                    }}
-                  /> :
-                  <span className={classNames({
-                    "line-through": todo.isDone
-                  })}>
-                    {todo.title}
-                  </span>}
-
-                <div>
-                  {!isEdit &&
-                    <button
-                      onClick={() => handleDelete(todo.$id)}
-                      className="px-2 py-1 text-red-500"
-                    >
-                      <TrashIcon className="w-4"></TrashIcon>
-                    </button>}
-
-
-                  {/* {isEdit ?
-                    <button
-                      className="px-2 py-1 text-slate-500"
-                      onClick={() => handleUpdate(todo)}
-                    >
-                      ok
-                    </button> :
-
-                    <button
-                      className="px-2 py-1 text-slate-500"
-                      onClick={() => setIsEdit(prevState => !prevState)}
-                    >
-                      <PencilIcon className="w-4" />
-                    </button>} */}
+                    <TrashIcon className="w-4"></TrashIcon>
+                  </button>
                 </div>
-              </div>
-            )
-          })}
+              )
+            }) : <p className="text-center">nothing is here</p>}
+          </div>
         </div>
-      </div>
-    </section>
-  )
+      </section>
+    )
+  }
 }
 
 export default Todos

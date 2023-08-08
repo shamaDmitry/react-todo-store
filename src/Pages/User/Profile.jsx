@@ -19,6 +19,9 @@ const Profile = () => {
         </li>
         <li>
           email: <span className="font-bold">{user.email}</span>
+          {!user.emailVerification &&
+            <span className="px-2 py-1 ml-2 text-xs font-bold text-white bg-red-500 rounded-3xl">not verified</span>
+          }
         </li>
         <li>
           registration:
