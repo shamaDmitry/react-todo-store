@@ -1,3 +1,4 @@
+import React from 'react'
 import { useEffect, useState } from "react";
 import Button from "../Components/atoms/Button";
 import Title from "../Components/atoms/Title";
@@ -5,6 +6,7 @@ import Modal from "../Components/shared/Modal";
 import useAuthStore from "../store/authStore";
 import useOrderStore from "../store/orderStore";
 import CreateOrderForm from "./Orders/CreateOrderForm";
+import OrdersTable from './Orders/OrdersTable';
 
 const Orders = () => {
   const [open, setOpen] = useState(false)
@@ -55,9 +57,9 @@ const Orders = () => {
           className="mb-4"
         ></Button>
 
-        <pre className="mb-4 overflow-auto">
-          {JSON.stringify(orders)}
-        </pre>
+        <OrdersTable
+          data={orders}
+        />
 
         {
           orders?.documents?.map(order => {
