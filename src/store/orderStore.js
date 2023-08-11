@@ -4,6 +4,7 @@ import { databases, ID } from '../../appwrite';
 
 const useOrderStore = create((set) => ({
   orders: [],
+  products: [],
   getAllOrders: async () => {
     const data = await databases.listDocuments(
       import.meta.env.VITE_DATABASE_ID,
@@ -13,16 +14,35 @@ const useOrderStore = create((set) => ({
 
     return data;
   },
-  
-  createOrder: async (userId) => {
+
+  getAllProducts: async () => {
+    const data = await databases.listDocuments(
+      import.meta.env.VITE_DATABASE_ID,
+      import.meta.env.VITE_PRODUCTS_COLLECTION_ID,
+    )
+
+    set({ products: data.documents });
+
+    return data;
+  },
+
+  createOrder: async (data) => {
+    const {
+      dateTime,
+      deliveryPlace,
+      product,
+      userId
+    } = data;
+
     const res = await databases.createDocument(
       import.meta.env.VITE_DATABASE_ID,
       import.meta.env.VITE_ORDERS_COLLECTION_ID,
       ID.unique(),
       {
-        deliveryPlace: "deliveryPlace",
-        dateTime: new Date().toJSON(),
-        price: 100,
+        products: [product.title],
+        deliveryPlace,
+        dateTime: dateTime,
+        price: product.price,
       },
       [
         Permission.write(Role.user(userId)),

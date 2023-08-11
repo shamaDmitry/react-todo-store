@@ -9,16 +9,43 @@ import CreateOrderForm from "./Orders/CreateOrderForm";
 import OrdersTable from './Orders/OrdersTable';
 
 const Orders = () => {
-  const [open, setOpen] = useState(false)
-
+  const [open, setOpen] = useState(false);
   const [user] = useAuthStore(store => [
     store.user,
   ]);
 
+  const [
+    orders,
+    products,
+    createOrder,
+    getAllOrders,
+    deleteOrder,
+    getAllProducts,
+  ] = useOrderStore(store => [
+    store.orders,
+    store.products,
+    store.createOrder,
+    store.getAllOrders,
+    store.deleteOrder,
+    store.getAllProducts,
+  ]);
+
+  const [date, setDate] = useState("");
+  const [address, setAddress] = useState("");
+  const [product, setProduct] = useState();
+
   const handleSave = () => {
     setOpen(false);
-    createOrder(user.$id).then(() => {
-      getAllOrders()
+
+    const data = {
+      dateTime: date,
+      product: JSON.parse(product),
+      deliveryPlace: address,
+      userId: user.$id,
+    }
+
+    createOrder(data).then(() => {
+      getAllOrders();
     })
   }
   const handleDelete = (orderId) => {
@@ -27,22 +54,11 @@ const Orders = () => {
     })
   }
 
-  const [
-    orders,
-    createOrder,
-    getAllOrders,
-    deleteOrder,
-  ] = useOrderStore(store => [
-    store.orders,
-    store.createOrder,
-    store.getAllOrders,
-    store.deleteOrder,
-  ]);
-
   useEffect(() => {
-    getAllOrders()
+    getAllOrders();
+    getAllProducts();
     return () => { };
-  }, [getAllOrders]);
+  }, [getAllOrders, getAllProducts]);
 
   return (
     <>
@@ -61,7 +77,7 @@ const Orders = () => {
           data={orders}
         />
 
-        {
+        {/* {
           orders?.documents?.map(order => {
             return (
               <div
@@ -78,7 +94,7 @@ const Orders = () => {
               </div>
             )
           })
-        }
+        } */}
       </section>
 
       <Modal
@@ -92,7 +108,18 @@ const Orders = () => {
           create order
         </h1>
 
-        <CreateOrderForm />
+        <CreateOrderForm
+          data={{
+            date,
+            address,
+            product,
+          }}
+          handlers={{
+            setDate,
+            setAddress,
+            setProduct
+          }}
+        />
       </Modal>
     </>
   );

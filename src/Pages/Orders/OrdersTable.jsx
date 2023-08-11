@@ -7,8 +7,6 @@ import StatusBadge from '../../Components/atoms/StatusBadge';
 import dayjs from 'dayjs';
 
 const OrdersTable = ({ data }) => {
-  console.log("data", data);
-
   const gridRef = useRef();
   const [rowData, setRowData] = useState();
 
