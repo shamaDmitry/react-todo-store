@@ -3,7 +3,6 @@ import React from 'react';
 const Combobox = ({ menuItems, value, onChange }) => {
   return (
     <select
-      type="text"
       className="w-full px-3 py-1 bg-white border"
       value={value}
       onChange={e => onChange(e.target.value)}

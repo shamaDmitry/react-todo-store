@@ -9,45 +9,18 @@ import CreateOrderForm from "./Orders/CreateOrderForm";
 import OrdersTable from './Orders/OrdersTable';
 
 const Orders = () => {
-  const [open, setOpen] = useState(false);
-  const [user] = useAuthStore(store => [
-    store.user,
-  ]);
-
   const [
     orders,
-    products,
-    createOrder,
     getAllOrders,
     deleteOrder,
     getAllProducts,
   ] = useOrderStore(store => [
     store.orders,
-    store.products,
-    store.createOrder,
     store.getAllOrders,
     store.deleteOrder,
     store.getAllProducts,
   ]);
 
-  const [date, setDate] = useState("");
-  const [address, setAddress] = useState("");
-  const [product, setProduct] = useState();
-
-  const handleSave = () => {
-    setOpen(false);
-
-    const data = {
-      dateTime: date,
-      product: JSON.parse(product),
-      deliveryPlace: address,
-      userId: user.$id,
-    }
-
-    createOrder(data).then(() => {
-      getAllOrders();
-    })
-  }
   const handleDelete = (orderId) => {
     deleteOrder(orderId).then(() => {
       getAllOrders();
@@ -67,17 +40,11 @@ const Orders = () => {
           text="Orders"
         />
 
-        <Button
-          label="Create order"
-          onClick={() => setOpen(!open)}
-          className="mb-4"
-        ></Button>
-
         <OrdersTable
           data={orders}
         />
 
-        {/* {
+        {
           orders?.documents?.map(order => {
             return (
               <div
@@ -94,33 +61,8 @@ const Orders = () => {
               </div>
             )
           })
-        } */}
+        }
       </section>
-
-      <Modal
-        open={open}
-        setOpen={setOpen}
-        handleOk={handleSave}
-        okText="Save"
-        cancelText="Cancel"
-      >
-        <h1 className="mb-3 text-lg font-bold capitalize">
-          create order
-        </h1>
-
-        <CreateOrderForm
-          data={{
-            date,
-            address,
-            product,
-          }}
-          handlers={{
-            setDate,
-            setAddress,
-            setProduct
-          }}
-        />
-      </Modal>
     </>
   );
 }

@@ -5,12 +5,57 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import StatusBadge from '../../Components/atoms/StatusBadge';
 import dayjs from 'dayjs';
+import Modal from '../../Components/shared/Modal';
+import CreateOrderForm from './CreateOrderForm';
+import useAuthStore from '../../store/authStore';
+import Button from '../../Components/atoms/Button';
+import useOrderStore from '../../store/orderStore';
 
 const OrdersTable = ({ data }) => {
+  const [user] = useAuthStore(store => [
+    store.user,
+  ]);
+
+  const [
+    createOrder,
+    getAllOrders,
+  ] = useOrderStore(store => [
+    store.createOrder,
+    store.getAllOrders,
+  ]);
+
+
+  const [open, setOpen] = useState(false);
+  const [date, setDate] = useState(new Date());
+  const [address, setAddress] = useState("");
+  const [product, setProduct] = useState();
+  const [status, setStatus] = useState();
+
+  const handleSave = () => {
+    setOpen(false);
+
+    const data = {
+      dateTime: date,
+      product: JSON.parse(product),
+      deliveryPlace: address,
+      status,
+      userId: user.$id,
+    }
+
+    createOrder(data).then(() => {
+      getAllOrders();
+    });
+  }
+
   const gridRef = useRef();
   const [rowData, setRowData] = useState();
 
   const [columnDefs, setColumnDefs] = useState([
+    {
+      field: "dateTime",
+      headerName: "To Date",
+      valueFormatter: (params) => dayjs(params.value),
+    },
     {
       field: 'products',
       valueFormatter: (params) => {
@@ -33,14 +78,14 @@ const OrdersTable = ({ data }) => {
         />
       },
     },
+    { field: 'deliveryPlace', sortable: false },
+    { field: 'price', },
     {
       field: '$createdAt',
       headerName: "Created",
       valueFormatter: (params) => dayjs(params.value),
     },
     { field: '$updatedAt', headerName: "Updated", valueFormatter: (params) => dayjs(params.value), },
-    { field: 'deliveryPlace', sortable: false },
-    { field: 'price', }
   ]);
 
   const defaultColDef = useMemo(() => ({
@@ -52,6 +97,15 @@ const OrdersTable = ({ data }) => {
 
   const cellClickedListener = useCallback(event => {
     console.log('cellClicked', event);
+    setOpen(true);
+
+    const { data } = event
+
+    console.log(data);
+    setDate(data.dateTime);
+    setAddress(data.deliveryPlace);
+    setProduct(data.product);
+    setStatus(data.status);
   }, []);
 
   const onFirstDataRendered = useCallback((params) => {
@@ -67,20 +121,73 @@ const OrdersTable = ({ data }) => {
     gridRef.current.api.deselectAll();
   }, []);
 
+  const onFilterTextBoxChanged = useCallback(() => {
+    gridRef.current.api.setQuickFilter(
+      document.getElementById('filter-text-box').value
+    );
+  }, []);
+
   return (
-    <div className="ag-theme-alpine h-96">
-      <AgGridReact
-        ref={gridRef} // Ref for accessing Grid's API
-        rowData={rowData} // Row Data for Rows
-        columnDefs={columnDefs} // Column Defs for Columns
-        defaultColDef={defaultColDef} // Default Column Properties
-        animateRows={false} // Optional - set to 'true' to have rows animate when sorted
-        rowSelection='multiple' // Options - allows click selection of rows
-        onCellClicked={cellClickedListener} // Optional - registering for Grid Event
-        onFirstDataRendered={onFirstDataRendered}
-        pagination
-      />
-    </div>
+    <>
+      <div className="flex mb-4">
+        <Button
+          label="Create order"
+          onClick={() => setOpen(!open)}
+        />
+
+        <div className="ml-auto">
+          <input
+            className="px-3 py-1 text-base border"
+            type="text"
+            id="filter-text-box"
+            placeholder="Search..."
+            onInput={onFilterTextBoxChanged}
+          />
+        </div>
+      </div>
+
+      <div className="ag-theme-alpine h-96">
+        <AgGridReact
+          ref={gridRef} // Ref for accessing Grid's API
+          rowData={rowData} // Row Data for Rows
+          columnDefs={columnDefs} // Column Defs for Columns
+          defaultColDef={defaultColDef} // Default Column Properties
+          animateRows={false} // Optional - set to 'true' to have rows animate when sorted
+          rowSelection='multiple' // Options - allows click selection of rows
+          onCellClicked={cellClickedListener} // Optional - registering for Grid Event
+          onFirstDataRendered={onFirstDataRendered}
+          pagination
+        />
+      </div>
+
+      <Modal
+        open={open}
+        setOpen={setOpen}
+        handleOk={handleSave}
+        okText="Save"
+        cancelText="Cancel"
+      >
+        <h1 className="mb-3 text-lg font-bold capitalize">
+          create order
+        </h1>
+
+        <CreateOrderForm
+          data={{
+            date,
+            address,
+            product,
+            status,
+          }}
+          handlers={{
+            setDate,
+            setAddress,
+            setProduct,
+            setStatus,
+          }}
+        />
+      </Modal>
+    </>
+
   );
 }
 
