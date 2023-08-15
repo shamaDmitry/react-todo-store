@@ -19,13 +19,16 @@ const OrdersTable = ({ data }) => {
   const [
     createOrder,
     getAllOrders,
+    updateOrder,
   ] = useOrderStore(store => [
     store.createOrder,
     store.getAllOrders,
+    store.updateOrder,
   ]);
 
 
   const [open, setOpen] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
   const [date, setDate] = useState(new Date());
   const [address, setAddress] = useState("");
   const [product, setProduct] = useState();
@@ -42,9 +45,19 @@ const OrdersTable = ({ data }) => {
       userId: user.$id,
     }
 
-    createOrder(data).then(() => {
-      getAllOrders();
-    });
+    console.log('data', data);
+    console.log('isEdit', isEdit);
+    
+
+    // if (!isEdit) {
+    //   createOrder(data).then(() => {
+    //     getAllOrders();
+    //   });
+    // } else {
+    //   updateOrder(data).then(() => {
+    //     getAllOrders();
+    //   });
+    // }
   }
 
   const gridRef = useRef();
@@ -56,19 +69,19 @@ const OrdersTable = ({ data }) => {
       headerName: "To Date",
       valueFormatter: (params) => dayjs(params.value),
     },
-    {
-      field: 'products',
-      valueFormatter: (params) => {
-        return params.value.join(", ")
-      },
-      cellRenderer: (params) => {
-        return (
-          <div className="flex flex-col">
-            {params.valueFormatted}
-          </div>
-        )
-      },
-    },
+    // {
+    //   field: 'products',
+    //   valueFormatter: (params) => {
+    //     return params.value.join(", ")
+    //   },
+    //   cellRenderer: (params) => {
+    //     return (
+    //       <div className="flex flex-col">
+    //         {params.valueFormatted}
+    //       </div>
+    //     )
+    //   },
+    // },
     {
       field: 'status',
       cellRenderer: (params) => {
@@ -96,12 +109,11 @@ const OrdersTable = ({ data }) => {
   }));
 
   const cellClickedListener = useCallback(event => {
-    console.log('cellClicked', event);
     setOpen(true);
+    setIsEdit(true);
 
     const { data } = event
 
-    console.log(data);
     setDate(data.dateTime);
     setAddress(data.deliveryPlace);
     setProduct(data.product);
@@ -153,7 +165,7 @@ const OrdersTable = ({ data }) => {
           columnDefs={columnDefs} // Column Defs for Columns
           defaultColDef={defaultColDef} // Default Column Properties
           animateRows={false} // Optional - set to 'true' to have rows animate when sorted
-          rowSelection='multiple' // Options - allows click selection of rows
+          rowSelection='single' // Options - allows click selection of rows
           onCellClicked={cellClickedListener} // Optional - registering for Grid Event
           onFirstDataRendered={onFirstDataRendered}
           pagination

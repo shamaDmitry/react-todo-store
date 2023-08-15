@@ -60,6 +60,21 @@ const useOrderStore = create((set) => ({
     return res;
   },
 
+  updateOrder: async (order) => {
+    console.log('order', order);
+
+    // const { $databaseId, $collectionId, $id } = order;
+
+    // await databases.updateDocument(
+    //   $databaseId,
+    //   $collectionId,
+    //   $id,
+    //   order
+    // );
+
+    // get().getAllOrders();
+  },
+
   deleteOrder: async (orderId) => {
     await databases.deleteDocument(
       import.meta.env.VITE_DATABASE_ID,
